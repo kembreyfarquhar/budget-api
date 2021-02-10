@@ -48,6 +48,65 @@ budgetsRouter.get('/items/:id', isBudget, async (req, res) => {
 });
 
 /**
+ * GET ALL EXPENSES BY BUDGET ID
+ * @param {id: query string param (budget id)}
+ */
+budgetsRouter.get('/expenses/:id', isBudget, async (req, res) => {
+	const budget_id = req.budget.id;
+
+	try {
+		const expenses = await BudgetItemConroller.findItemsinBudgetByCategory(1, budget_id);
+		res.status(StatusCodes.OK).json(expenses);
+	} catch (err) {
+		sendError.serverError(err, res);
+	}
+});
+
+/**
+ * GET ALL INCOME BY BUDGET ID
+ * @param {id: query string param (budget id)}
+ */
+budgetsRouter.get('/income/:id', isBudget, async (req, res) => {
+	const budget_id = req.budget.id;
+
+	try {
+		const income = await BudgetItemConroller.findItemsinBudgetByCategory(2, budget_id);
+		res.status(StatusCodes.OK).json(income);
+	} catch (err) {
+		sendError.serverError(err, res);
+	}
+});
+
+/**
+ * GET FULL BUDGET
+ */
+budgetsRouter.get('/full/:id', isBudget, async (req, res) => {
+	const budget_id = req.budget.id;
+	let budget = req.budget;
+	try {
+		let income = await BudgetItemConroller.findItemsinBudgetByCategory(2, budget_id);
+		let expenses = await BudgetItemConroller.findItemsinBudgetByCategory(1, budget_id);
+		let income_total = income.reduce((acc, curr) => {
+			return acc + curr.amount;
+		}, 0.0);
+		let expenses_total = expenses.reduce((acc, curr) => {
+			return acc + curr.amount;
+		}, 0.0);
+		let budget_total = income_total - expenses_total;
+		const total = parseFloat(budget_total.toString()).toFixed(2);
+		const iTotal = parseFloat(income_total.toString()).toFixed(2);
+		const eTotal = parseFloat(expenses_total.toString()).toFixed(2);
+		income_total = Number(iTotal);
+		expenses_total = Number(eTotal);
+		budget_total = Number(total);
+		const totals = { budget_total, income_total, expenses_total };
+		res.status(StatusCodes.OK).json({ totals, budget, income, expenses });
+	} catch (err) {
+		sendError.serverError(err, res);
+	}
+});
+
+/**
  * ADD NEW BUDGET
  * @param {user_id: body number param}
  * @param {title: body string param}

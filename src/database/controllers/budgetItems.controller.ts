@@ -15,19 +15,26 @@ class BudgetItemConroller implements Controller {
 	public static tableName: string = 'budget_items';
 	connection = connection;
 
-	public static findByBudgetId(id: string | number) {
-		return connection(this.tableName).where({ id }).first();
+	public static findByBudgetId(budget_id: string | number) {
+		return connection(this.tableName).where({ budget_id });
 	}
 
 	public static findById(id: string | number) {
-		return connection(this.tableName).where({ id });
+		return connection(this.tableName).where({ id }).first();
+	}
+
+	public static findItemsinBudgetByCategory(
+		category_id: string | number,
+		budget_id: string | number
+	) {
+		return connection(this.tableName).where({ category_id }).and.where({ budget_id });
 	}
 
 	public static async add(budget_item: Partial<BudgetItemType>) {
 		const [newBudgetItem] = await connection(this.tableName).insert(budget_item).returning('*');
 
 		return environment === 'development'
-			? BudgetItemConroller.findByBudgetId(newBudgetItem)
+			? BudgetItemConroller.findById(newBudgetItem)
 			: newBudgetItem;
 	}
 }
