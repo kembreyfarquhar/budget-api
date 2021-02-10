@@ -12,19 +12,14 @@ const app = express();
 
 app.use(express.json());
 
-// app.get('/', (req, res) => {
-// 	res.json({ total: -12.2 });
-// });
-
 app.use('/auth', authRouter);
-
-app.use('/api/budgets', budgetsRouter);
 
 /**
  * All Routes Below this require Token Authorization
- * @param {token: JWTToken}
+ * @param {token: JWTToken in Authorization Header}
  */
 app.use(requireToken);
 app.use('/api/users', usersRouter);
+app.use('/api/budgets', budgetsRouter);
 
 export { app };

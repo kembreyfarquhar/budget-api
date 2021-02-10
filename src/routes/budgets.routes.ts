@@ -79,6 +79,11 @@ budgetsRouter.get('/income/:id', isBudget, async (req, res) => {
 
 /**
  * GET FULL BUDGET
+ * @param {id: query string param (budget id)}
+ * @returns {totals: object with budget_total, income_total, expenses_total}
+ * @returns {budget: Budget}
+ * @returns {income: income budget items[]}
+ * @returns {expenses: expense budget items[]}
  */
 budgetsRouter.get('/full/:id', isBudget, async (req, res) => {
 	const budget_id = req.budget.id;
@@ -127,6 +132,8 @@ budgetsRouter.post('/', async (req, res) => {
 
 /**
  * ADD ITEM TO BUDGET
+ * @param {id: query string param (budget id)}
+ * @returns {budget: Budget}
  */
 budgetsRouter.post('/items/:id', isBudget, async (req, res) => {
 	const budget_id = req.budget.id;

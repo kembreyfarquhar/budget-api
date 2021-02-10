@@ -2,8 +2,6 @@ import { Controller } from '../../types/Controller';
 import { connection } from '../dbConnection';
 import { User } from '../models/users.model';
 import dotenv from 'dotenv';
-import { sendError } from '../../utils/sendError';
-import { Response } from 'express';
 dotenv.config();
 
 const environment = process.env.NODE_ENV;

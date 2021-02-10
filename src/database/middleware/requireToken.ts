@@ -7,6 +7,10 @@ dotenv.config();
 
 const secret = process.env.JWT_SECRET;
 
+/**
+ * MIDDLEWARE FOR CHECKING IF TOKEN AUTHORIZATION EXISTS & IS VALID
+ * @param {token: authorization header, token value}
+ */
 const requireToken: RequestHandler = (req, res, next) => {
 	const token = req.headers.authorization;
 
