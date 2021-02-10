@@ -1,8 +1,4 @@
-interface UserType {
-	id: string | number;
-	username: string;
-	password: string;
-}
+import { UserType } from '../../types/User';
 
 class User implements UserType {
 	id: string | number;

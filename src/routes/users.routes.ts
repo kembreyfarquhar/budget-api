@@ -1,50 +1,49 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import { UserController } from '../database/controllers/users.controller';
-import bcrypt from 'bcryptjs';
-import { User } from '../database/models/users.model';
+import { StatusCodes } from '../enums/StatusCodes';
+import { sendError } from '../utils/sendError';
+import { isUser } from '../database/middleware/users.middleware';
 
 const usersRouter = express.Router();
 
 /**
  * GET ALL USERS
- * @returns {users: User[]}
+ * @returns {users: <Partial>User[]}
  */
-usersRouter.get('/', async (req: Request, res: Response) => {
+usersRouter.get('/', async (_req, res) => {
 	try {
 		let users = await UserController.find();
 		users.forEach(user => delete user.password);
-		res.status(200).json(users);
+		res.status(StatusCodes.OK).json(users);
 	} catch (err) {
-		res.status(500).json({
-			error: err.toString(),
-			message: err.message ? err.message : 'error processing request',
-		});
+		sendError.serverError(err, res);
 	}
+});
 
-	/**
-	 * ADD NEW USER
-	 * @param {user: User}
-	 * @returns {newUser: User}
-	 */
-	usersRouter.post('/register', async (req: Request, res: Response) => {
-		const user = new User();
-		user.username = req.body.username;
-		user.password = req.body.password;
+/**
+ * GET USER BY ID
+ * @param {id: string}
+ * @returns {user: <Partial>User}
+ */
+usersRouter.get('/:id', isUser, async (req, res) => {
+	const user = req.user;
+	delete user.password;
+	res.status(StatusCodes.OK).json(user);
+});
 
-		const hash = bcrypt.hashSync(user.password, 10);
-		user.password = hash;
+/**
+ * DELETE USER
+ * @param {id: string}
+ */
+usersRouter.delete('/:id', isUser, async (req, res) => {
+	const user = req.user;
 
-		try {
-			const addedUser = await UserController.add(user);
-			delete addedUser.password;
-			res.status(201).json(addedUser);
-		} catch (err) {
-			res.status(500).json({
-				error: err.toString(),
-				message: err.message ? err.message : 'error processing request',
-			});
-		}
-	});
+	try {
+		await UserController.remove(user.id);
+		res.sendStatus(StatusCodes.NO_RESPONSE).end();
+	} catch (err) {
+		sendError.serverError(err, res);
+	}
 });
 
 export { usersRouter };
