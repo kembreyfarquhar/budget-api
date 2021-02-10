@@ -1,0 +1,4 @@
+node_modules/
+dist/
+/src/database/dev.sqlite3
+.env
