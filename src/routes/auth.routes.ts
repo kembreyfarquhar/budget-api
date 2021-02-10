@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import bcrypt from 'bcryptjs';
 import { UserController } from '../database/controllers/users.controller';
 import { User } from '../database/models/users.model';
@@ -11,10 +11,10 @@ const authRouter = express.Router();
 
 /**
  * REGISTER NEW USER
- * @param {user: USER}
- * @returns {newUser: <Partial>User}
+ * @param {user: Partial<User>(username, password), body string params}
+ * @returns {newUser: Partial<User>}
  */
-authRouter.post('/register', async (req: Request, res: Response) => {
+authRouter.post('/register', async (req, res) => {
 	const user = new User();
 	user.username = req.body.username;
 	user.password = req.body.password;
@@ -34,9 +34,9 @@ authRouter.post('/register', async (req: Request, res: Response) => {
 
 /**
  * LOGIN USER
- * @param {username: string}
- * @param {password: string}
- * @returns {user: <Partial>User}
+ * @param {username: body string param}
+ * @param {password: body string param}
+ * @returns {user: Partial<User>}
  */
 authRouter.post('/login', isUser, (req, res) => {
 	const user = req.user;

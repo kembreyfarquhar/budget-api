@@ -1,7 +1,7 @@
 import { Controller } from '../../types/Controller';
 import { connection } from '../dbConnection';
-import { Budget } from '../models/budgets.model';
 import dotenv from 'dotenv';
+import { BudgetType } from '../../types/Budget';
 dotenv.config();
 
 const environment = process.env.NODE_ENV;
@@ -12,7 +12,7 @@ const environment = process.env.NODE_ENV;
  */
 class BudgetController implements Controller {
 	tableName: string;
-	public static tableName: string = 'users';
+	public static tableName: string = 'budgets';
 	connection = connection;
 
 	public static find() {
@@ -29,13 +29,28 @@ class BudgetController implements Controller {
 		return connection(this.tableName).where({ id }).first();
 	}
 
-	public static async add(budget: Budget) {
+	public static findUserBudgets(user_id: string | number) {
+		return connection(this.tableName).where({ user_id });
+	}
+
+	public static findCategoryId(category: string) {
+		return connection.raw(`select id from budget_categories where category="${category}"`);
+	}
+
+	public static async add(budget: Partial<BudgetType>) {
 		const query = connection.insert(budget).toQuery();
 		console.log(query);
 
 		const [newBudget] = await connection(this.tableName).insert(budget).returning('*');
 
 		return environment === 'development' ? BudgetController.findById(newBudget) : newBudget;
+	}
+
+	public static remove(id: string | number) {
+		const query = connection.where({ id }).del().toQuery();
+		console.log(query);
+
+		return connection(this.tableName).where({ id }).del();
 	}
 }
 

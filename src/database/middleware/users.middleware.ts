@@ -3,6 +3,11 @@ import { sendError } from '../../utils/sendError';
 import { StatusCodes } from '../../enums/StatusCodes';
 import { UserController } from '../controllers/users.controller';
 
+/**
+ * MIDDLEWARE FOR CHECKING IF USER EXISTS IN DATABASE
+ * @param {id: query string param}
+ * @param {username: string body param}
+ */
 export const isUser: RequestHandler = async (req, res, next) => {
 	const { id } = req.params;
 	const { username } = req.body;
